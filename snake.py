@@ -41,9 +41,10 @@ velocityX = 0
 velocityY = 0
 game_over = False
 score = 0
+after_id = None  # To store the after event ID
 
 def reset_game():
-    global snake, food, snake_body, velocityX, velocityY, game_over, score
+    global snake, food, snake_body, velocityX, velocityY, game_over, score, after_id
     snake = Tile(5 * TILE_SIZE, 5 * TILE_SIZE)
     snake_body = []
     food = Tile(random.randint(0, COLS-1) * TILE_SIZE, random.randint(0, ROWS-1) * TILE_SIZE)
@@ -51,6 +52,8 @@ def reset_game():
     velocityY = 0
     game_over = False
     score = 0
+    if after_id is not None:
+        window.after_cancel(after_id)  # Cancel the previous after event
 
 def change_direction(e):  # e = event
     global velocityX, velocityY, game_over
@@ -72,7 +75,6 @@ def change_direction(e):  # e = event
     elif e.keysym == "Right" and velocityX != -1:
         velocityX = 1
         velocityY = 0
-
 
 def move():
     global snake, food, game_over, score
@@ -104,7 +106,7 @@ def move():
     snake.y += velocityY * TILE_SIZE
 
 def draw():
-    global game_over, score
+    global game_over, score, after_id
     move()
 
     canvas.delete("all")
@@ -122,7 +124,7 @@ def draw():
     else:
         canvas.create_text(30, 20, font="Arial 10", text=f"SCORE: {score}", fill="white")
 
-    window.after(100, draw)  # 100ms = 1/10 second, 10 frames/second
+    after_id = window.after(100, draw)  # Store the after ID for later cancellation
 
 # Start the game loop
 draw()
